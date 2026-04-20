@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <title>Kemi – Glosträning</title>
+
+  <style>
+    /* ===== BAKGRUND OCH TEMAN ===== */
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+    }
+
+    body.blue {
+      background: linear-gradient(90deg, #6a11cb, #2575fc);
+    }
+
+    body.green {
+      background: linear-gradient(90deg, #11998e, #38ef7d);
+    }
+
+    body.dark {
+      background: linear-gradient(90deg, #232526, #414345);
+    }
+
+    /* ===== APP-KORT ===== */
+    .app {
+      background: white;
+      max-width: 520px;
+      width: 100%;
+      padding: 20px;
+      margin: 30px 10px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    }
+
+    h1 { text-align: center; }
+
+    .themes {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .themes button {
+      flex: 1;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 10px;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+    }
+
+    .row {
+      margin-bottom: 15px;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    .correct { background-color: #d4edda; }
+    .wrong   { background-color: #f8d7da; }
+
+    .feedback { font-size: 14px; margin-top: 5px; }
+  </style>
+</head>
+
+<body class="blue">
+
+<div class="app">
+
+<h1>⚗️ Kemi – Glosträning</h1>
+
+<!-- 🎨 TEMA-KNAPPAR -->
+<div class="themes">
+  <button onclick="setTheme('blue')">Blå</button>
+  <button onclick="setTheme('green')">Grön</button>
+  <button onclick="setTheme('dark')">Mörk</button>
+</div>
+
+<h2>1️⃣ Träningsläge</h2>
+<label>
+  <input type="radio" name="mode" value="nameToFormula" checked>
+  Namn → Formel
+</label><br>
+<label>
+  <input type="radio" name="mode" value="formulaToName">
+  Formel → Namn
+</label>
+
+<h2>2️⃣ Välj glosor</h2>
+<label><input type="checkbox" value="Saltsyra|HCl"> Saltsyra</label><br>
+<label><input type="checkbox" value="Salpetersyra|HNO3"> Salpetersyra</label><br>
+<label><input type="checkbox" value="Svavelsyra|H2SO4"> Svavelsyra</label><br>
+<label><input type="checkbox" value="Natriumhydroxid|NaOH"> Natriumhydroxid</label><br>
+<label><input type="checkbox" value="Ättiksyra|CH3COOH"> Ättiksyra</label><br>
+<label><input type="checkbox" value="Kaliumhydroxid|KOH"> Kaliumhydroxid</label><br>
+
+<button id="startBtn">▶️ Starta träning</button>
+
+<hr>
+
+<h2>3️⃣ Övning</h2>
+<div id="training"></div>
+
+<button id="checkBtn">✅ Rätta</button>
+<p id="result"></p>
+
+</div>
+
+<script>
+  /* 🎨 TEMA */
+  function setTheme(theme) {
+    document.body.className = theme;
+  }
+
+  /* 📘 GLOSTRÄNING */
+  const startBtn = document.getElementById("startBtn");
+  const checkBtn = document.getElementById("checkBtn");
+  const training = document.getElementById("training");
+  const result = document.getElementById("result");
+
+  let questions = [];
+
+  startBtn.onclick = function () {
+    const checked = document.querySelectorAll("input[type=checkbox]:checked");
+    const mode = document.querySelector("input[name=mode]:checked").value;
+
+    if (checked.length === 0) {
+      alert("Välj minst en glosa!");
+      return;
+    }
+
+    training.innerHTML = "";
+    result.textContent = "";
+    questions = [];
+
+    checked.forEach((box, i) => {
+      const [name, formula] = box.value.split("|");
+      const q = mode === "nameToFormula" ? name : formula;
+      const a = mode === "nameToFormula" ? formula : name;
+
+      questions.push({ answer: a });
+
+      training.innerHTML += `
+        <div class="row" id="row${i}">
+          <strong>${q}</strong>
+          <input id="ans${i}">
+          <div class="feedback" id="fb${i}"></div>
+        </div>
+      `;
+    });
+  };
+
+  checkBtn.onclick = function () {
+    let score = 0;
+
+    questions.forEach((q, i) => {
+      const user = document.getElementById("ans" + i).value.trim();
+      const row = document.getElementById("row" + i);
+      const fb = document.getElementById("fb" + i);
+
+      if (user === q.answer) {
+        score++;
+        row.className = "row correct";
+        fb.textContent = "✅ Rätt";
+      } else {
+        row.className = "row wrong";
+        fb.textContent = "❌ Rätt svar: " + q.answer;
+      }
+    });
+
+    result.textContent =
+      `Du fick ${score} av ${questions.length} rätt ✅`;
+  };
+</script>
+
+</body>
+</html>
